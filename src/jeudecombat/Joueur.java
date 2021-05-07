@@ -46,7 +46,7 @@ public class Joueur {
         this.y = y;
     }
 
-    // --- Getters et Setters ---
+    // --- Getters et Setters --- //
 
     public int getVie() {
         return vie;
@@ -92,21 +92,22 @@ public class Joueur {
         return actions;
     }
 
-    // -- Methodes --
+    // --- Methodes --- //
 
-//    public int distanceJoueur(Joueur joueur){
-//        return Math.abs(joueur.x-this.x)+Math.abs(joueur.y-this.y);
-//    }
-
-    public void attaquer(Joueur joueur) throws DistanceIncorrecteException {
-//        if(this.distanceJoueur(joueur)>this.portee){
-//            throw new DistanceIncorrecteException("Joueur trop loin, imposible d'attaquer");
-//        }
-        // Le joueur est à portée, on attaque
+    /**
+     * Methode a appeler pour attaquer un joueur
+     * @param joueur joueur à attaquer
+     */
+    public void attaquer(Joueur joueur){
         De deDegats = new De(5);
         joueur.recevoirAttaque(deDegats.lancer());
     }
 
+    /**
+     * Vérifie si un joueur donné est attaquable
+     * @param joueur le joueur à attaquer
+     * @return le joueur est-il attaquable ou non
+     */
     public boolean peutAttaquer(Joueur joueur){
         int distance = Math.abs(joueur.x-this.x)+Math.abs(joueur.y-this.y);
         return distance<=this.portee;
@@ -133,19 +134,20 @@ public class Joueur {
         this.y = y;
     }
 
+    /**
+     * Vérifie si le joueur peut se déplacer aux coordonnées données
+     * @param joueurs liste des joueurs sur le terrain
+     * @param x coordonnées x du point d'arrivée
+     * @param y coordonnées y du point d'arrivée
+     * @return le joueur peut ou non se deplacer
+     */
     public boolean peutSeDeplacer(Joueur[] joueurs, int x, int y){
         for(int i=0; i<joueurs.length; i++){
-            if(joueurs[i].x == x && joueurs[i].y == y){
+            if(joueurs[i] != this && joueurs[i].x == x && joueurs[i].y == y){
                 return false;
             }
         }
         int distance = Math.abs(x-this.x)+Math.abs(y-this.y);
         return distance<=this.portee;
-    }
-}
-
-class DistanceIncorrecteException extends Exception{
-    public DistanceIncorrecteException(String erreur){
-        super(erreur);
     }
 }
