@@ -20,15 +20,14 @@ public class JeuDeCombat {
 //            System.out.println("2) Magicien : Attaque à distance à n'importe quel endroit et peut se téléporter");
 //            System.out.println("3) Voleur : Esquive les attaques et se rend invisible pendant un tour");
 //            int perso = demanderEntier("Veuillez entrer le numéro de votre personnage :",1,3);
-//            joueurs[i]=(perso,(int)(n*Math.random()),(int)(n*Math.random()); //à changer
-//
-//
+//            joueurs[i]=(perso,(int)(n*Math.random()),(int)(n*Math.random()); // changer la position
+//            modifStat(joueurs[i]);
 //        }
 //        while(!fini(joueurs)){
 //            afficherJeu(terrain, joueurs);
-//            afficherStat
+//            afficherStat ///à faaaire
 //            for(int i=0; i<joueurs.length; i++){
-//                tour(joueurs, joueurs[i]);
+//                tour(joueurs, joueurs[i], terrain);
 //            }
 //        }
         Joueur[] joueurs = {j1, j2};
@@ -37,29 +36,91 @@ public class JeuDeCombat {
         afficherJeu(terrain, joueurs);
     }
 
-    public static void tour(Joueur[] joueurs, Joueur principal,int n) {
+    public static void tour(Joueur[] joueurs, Joueur principal, char[][] terrain) {
         int nbActions = principal.getActions();
-        while(nbActions!=0){
+        int x;
+        int y;
+        int n = terrain.length;
+        afficherJeu(terrain, joueurs);
+        afficherStats(joueurs);
+        while(nbActions!=0 && !fini(joueurs)){
+            System.out.println("Veuillez choisir une action");
             System.out.println("1) Se déplacer");
-            System.out.println("2) Attaquer");
-            int action = demanderEntier("Veuillez entrer le numéro de l'action que vous souhaitez réaliser :",1,2);
+            if(principal.peutAttaquer(joueurs)){
+                System.out.println("2) Attaquer");
+            }
+            if(nbActions == principal.getActions()){
+                System.out.println("3) Capacité spéciale 1 : "+principal.getNomCapacite1()+" (1 fois par tour)");
+                System.out.println("4) Capacité spéciale 2 : "+principal.getNomCapacite2()+" (1 fois par tour)");
+            }
+            int action = demanderEntier("Veuillez entrer le numéro de l'action que vous souhaitez réaliser :",1,4);
             if(action==1){
-                int x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :",0, n-1);
-                int y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0 ,n-1);
-                if(principal.peutSeDeplacer(joueurs,x,y)){
-
+                x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
+                y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
+                while (!principal.peutSeDeplacer(joueurs, x, y)) {
+                    System.out.println("Impossible de se déplacer à cet endroit. Veuillez choisir une autre location.");
+                    x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
+                    y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
                 }
+                principal.seDeplacer(x, y);
 
             }else if(action==2){
+                if(!principal.peutAttaquer(joueurs)){
+                    System.out.println("Vous ne pouvez attaquer personne.");
+                    break;
+                }
                 int joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",0,joueurs.length);
+                while(!principal.peutAttaquerJoueur(joueurs[joueurAAttaquer])){
+                    System.out.println("Impossible d'attaquer ce joueur. Veuillez choisir un autre joueur.");
 
-                if(Joueur principal.peutAttaquer())
+                }
+                principal.attaquer(joueurs[joueurAAttaquer]);
+
+            }else if(action==3){
 
             }
-
-
             nbActions--;
         }
+    }
+
+    public static void afficherStats(Joueur[] joueur){
+        for(int i=0; i<joueur.length; i++) { /// phrase qui dit de quel joueur on parle, son symbole
+            System.out.println("Joueur : " + joueur[i].getClass());
+            System.out.println("Vies : " + joueur[i].getVie());
+            System.out.println("Force : " + joueur[i].getForce());
+            System.out.println("Portée : " + joueur[i].getPortee());
+            System.out.println("Défense : " + joueur[i].getDefense());
+        }
+
+    }
+
+    public static void modifStat(Joueur joueur){
+        int nbPoints = 5;
+        int stat;
+        int points;
+        System.out.println("Vous pouvez maintenant répartir "+ nbPoints + "points dans vos statistiques");
+        while(nbPoints>0){
+            ///utiliser la string
+            System.out.println("Voici vos statistiques : \n 1) Force : "+joueur.getForce()+"\n 2) Vie : "+joueur.getVie()+"\n 3) Défence : "+joueur.getDefense()+"\n 4) Portée : "+joueur.getPortee());
+            stat = demanderEntier("Veuillez choisir le numéro de la statistique auquel vous voulez ajouter des points", 1,4);
+            points = demanderEntier("Combien de points voulez-vous ajouter à cette statistique",1,nbPoints);
+            switch (stat) {
+                case 1 -> {
+                    joueur.setForce(joueur.getForce()+points);
+                }
+                case 2 -> {
+                    joueur.setVie(joueur.getVie()+points);
+                }
+                case 3 -> {
+                    joueur.setDefense(joueur.getDefense()+points);
+                }
+                case 4 -> {
+                    joueur.setPortee(joueur.getPortee()+points);
+                }
+            }
+            nbPoints -= points;
+        }
+        System.out.println("Vous avez maintenant fini de répartir vos points");
     }
 
     public static boolean fini(Joueur[] joueurs) {

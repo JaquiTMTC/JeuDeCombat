@@ -1,6 +1,6 @@
 package jeudecombat;
 
-import javax.management.InvalidAttributeValueException;
+import java.util.Scanner;
 
 public class Joueur {
     private int vie;
@@ -8,22 +8,29 @@ public class Joueur {
     private int defense;
     private int actions;
     private int force;
+    private int classe;
 
     public int x;
     public int y;
 
     public char caractere;
 
-    public boolean cache;
+    public boolean cache = false;
     public boolean mort;
 
+    private String nomCapacite1;
+    private String nomCapacite2;
+
     public Joueur(int classe, int x, int y, char caractere){
+        this.classe = classe;
         switch (classe) {
             case 1 -> { // Magicien
                 this.vie = 12;
                 this.portee = 3;
                 this.defense = 12;
                 this.force = 8;
+                this.nomCapacite1 = "Attaque à distance";
+                this.nomCapacite2 = "Fuite tactique";
             }
             case 2 -> { // Guerrier
                 this.vie = 15;
@@ -92,6 +99,29 @@ public class Joueur {
         return actions;
     }
 
+    public String getNomCapacite1() {
+        return nomCapacite1;
+    }
+
+    public String getNomCapacite2() {
+        return nomCapacite2;
+    }
+
+    public String getClasse(){
+        switch (this.classe){
+            case 1 -> {
+                return "Magicien";
+            }
+            case 2 -> {
+                return "Guerrier";
+            }
+            case 3 -> {
+                return "Voleur";
+            }
+        }
+        return "indéfini";
+    }
+
     // --- Methodes --- //
 
     /**
@@ -99,8 +129,11 @@ public class Joueur {
      * @param joueur joueur à attaquer
      */
     public void attaquer(Joueur joueur){
-        De deDegats = new De(5);
-        joueur.recevoirAttaque(deDegats.lancer());
+        De deDegats = new De(5, 5); /// ajouter force
+        De deAttaque = new De(20, 5); // modifier selon attributs joueur
+        if(deAttaque.lancer()>joueur.defense){
+            joueur.prendreDegats(deDegats.lancer());
+        }
     }
 
     /**
@@ -108,16 +141,18 @@ public class Joueur {
      * @param joueur le joueur à attaquer
      * @return le joueur est-il attaquable ou non
      */
-    public boolean peutAttaquer(Joueur joueur){
+    public boolean peutAttaquerJoueur(Joueur joueur){
         int distance = Math.abs(joueur.x-this.x)+Math.abs(joueur.y-this.y);
         return distance<=this.portee;
     }
 
-    private void recevoirAttaque(int degats){
-        De deAttaque = new De(20);
-        if(deAttaque.lancer()>this.defense){
-            this.prendreDegats(degats);
+    public boolean peutAttaquer(Joueur[] joueurs){
+        for(int i=0; i<joueurs.length; i++){
+            if(this.peutAttaquerJoueur(joueurs[i]) && this != joueurs[i]){
+                return true;
+            }
         }
+        return false;
     }
 
     private void prendreDegats(int degats) {
@@ -149,5 +184,35 @@ public class Joueur {
         }
         int distance = Math.abs(x-this.x)+Math.abs(y-this.y);
         return distance<=this.portee;
+    }
+
+//    public void capacite1(){
+//        Scanner sc = new Scanner(System.in);
+//        switch (this.classe){
+//            case 1 -> { // Magicien
+//                System.out.println("Veuillez choisir un joueur à attaquer");
+//
+//            }
+//            case 2 -> {
+//
+//            }
+//            case 3 -> {
+//
+//            }
+//        }
+//    }
+
+    public void capacite2(){
+
+    }
+    public String toString(Joueur[] joueur){ // A MODIFIER
+        String string = "";
+        for(int i=0; i<joueur.length; i++) { /// phrase qui dit de quel joueur on parle, son symbole
+            string += "Joueur " + joueur[i].getClass()+" : "+joueur[i].getClasse()+" "+joueur[i].caractere+" Vies : " + joueur[i].getVie()+" Force : " + joueur[i].getForce()+" Portée : " + joueur[i].getPortee()+" Défense : " + joueur[i].getDefense()+"\n";
+        }
+        return string;
+
+
+
     }
 }
