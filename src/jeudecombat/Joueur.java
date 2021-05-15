@@ -205,14 +205,8 @@ public class Joueur {
     public void capacite2(){
 
     }
-    public String toString(Joueur[] joueur){ // A MODIFIER
-        String string = "";
-        for(int i=0; i<joueur.length; i++) { /// phrase qui dit de quel joueur on parle, son symbole
-            string += "Joueur " + joueur[i].getClass()+" : "+joueur[i].getClasse()+" "+joueur[i].caractere+" Vies : " + joueur[i].getVie()+" Force : " + joueur[i].getForce()+" Portée : " + joueur[i].getPortee()+" Défense : " + joueur[i].getDefense()+"\n";
-        }
+    public String toString(){
+        String string = "Joueur : "+joueur[i].getClasse()+" "+joueur[i].caractere+"\n Vies : " + joueur[i].getVie()+"\n Force : " + joueur[i].getForce()+"\n Portée : " + joueur[i].getPortee()+"\n Défense : " + joueur[i].getDefense()+"\n";
         return string;
-
-
-
     }
 }

@@ -83,13 +83,9 @@ public class JeuDeCombat {
         }
     }
 
-    public static void afficherStats(Joueur[] joueur){
-        for(int i=0; i<joueur.length; i++) { /// phrase qui dit de quel joueur on parle, son symbole
-            System.out.println("Joueur : " + joueur[i].getClass());
-            System.out.println("Vies : " + joueur[i].getVie());
-            System.out.println("Force : " + joueur[i].getForce());
-            System.out.println("Portée : " + joueur[i].getPortee());
-            System.out.println("Défense : " + joueur[i].getDefense());
+    public static void afficherStats(Joueur[] joueurs){
+        for(int i=0; i<joueurs.length; i++) {
+            System.out.println(joueurs[i]);
         }
 
     }
@@ -101,7 +97,7 @@ public class JeuDeCombat {
         System.out.println("Vous pouvez maintenant répartir "+ nbPoints + "points dans vos statistiques");
         while(nbPoints>0){
             ///utiliser la string
-            System.out.println("Voici vos statistiques : \n 1) Force : "+joueur.getForce()+"\n 2) Vie : "+joueur.getVie()+"\n 3) Défence : "+joueur.getDefense()+"\n 4) Portée : "+joueur.getPortee());
+            System.out.println("Voici vos statistiques : "+joueur); // est-ce qu'on ajoute to String ?
             stat = demanderEntier("Veuillez choisir le numéro de la statistique auquel vous voulez ajouter des points", 1,4);
             points = demanderEntier("Combien de points voulez-vous ajouter à cette statistique",1,nbPoints);
             switch (stat) {
@@ -135,6 +131,8 @@ public class JeuDeCombat {
         }
         return true;
     }
+
+    public static void afficherStat ()
 
     private static void finPartie(Joueur joueur) {
         System.out.println(joueur + ", vous avez gagné !");
