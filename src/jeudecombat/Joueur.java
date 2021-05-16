@@ -16,7 +16,7 @@ public class Joueur {
     public char caractere;
 
     public boolean cache = false;
-    public boolean mort;
+    public boolean mort = false;
 
     private String nomCapacite1;
     private String nomCapacite2;
@@ -128,12 +128,15 @@ public class Joueur {
      * Methode a appeler pour attaquer un joueur
      * @param joueur joueur à attaquer
      */
-    public void attaquer(Joueur joueur){
+    public int attaquer(Joueur joueur){
         De deDegats = new De(5, 5); /// ajouter force
         De deAttaque = new De(20, 5); // modifier selon attributs joueur
         if(deAttaque.lancer()>joueur.defense){
-            joueur.prendreDegats(deDegats.lancer());
+            int degats = deDegats.lancer();
+            joueur.prendreDegats(degats);
+            return degats;
         }
+        return 0;
     }
 
     /**
@@ -205,8 +208,10 @@ public class Joueur {
     public void capacite2(){
 
     }
+
     public String toString(){
-        String string = "Joueur : "+joueur[i].getClasse()+" "+joueur[i].caractere+"\n Vies : " + joueur[i].getVie()+"\n Force : " + joueur[i].getForce()+"\n Portée : " + joueur[i].getPortee()+"\n Défense : " + joueur[i].getDefense()+"\n";
+        String string = this.getClasse()+" "+this.caractere+"\n 1) Vies : " + this.getVie()+"\n 2) Force : "
+                + this.getForce()+"\n 3) Portée : " + this.getPortee()+"\n 4) Défense : " + this.getDefense()+"\n";
         return string;
     }
 }
