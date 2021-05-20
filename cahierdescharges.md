@@ -30,6 +30,7 @@ Types de personnages :
 1. Le guerrier
 
     * Détruit tous les buissons dans un rayon de 5 cases
+    * Attaque tous les personnages dans un rayon de 5 cases
 
 2. Le magicien
 
@@ -38,8 +39,8 @@ Types de personnages :
 
 3. Le voleur
 
-    * Esquive les attaques
-    * Se rend invisible pendant 1 tour
+    * Vole des vies
+    * Vole une position
 
 Jauge/Capacités des personnages :
 

@@ -17,8 +17,8 @@ public class JeuDeCombat {
 
         for(int i=0; i<joueurs.length; i++){
             System.out.println("Joueur "+i+", c'est à vous de choisir votre classe."); /// Changer l'affichage des joueurs
-            System.out.println("1) Guerrier : Détruit tous les buissons dans un rayon de 5 cases");
-            System.out.println("2) Magicien : Attaque à distance à n'importe quel endroit et peut se téléporter");
+            System.out.println("1) Magicien : Attaque à distance à n'importe quel endroit et peut se téléporter");
+            System.out.println("2) Guerrier : Détruit tous les buissons dans un rayon de 5 cases");
             System.out.println("3) Voleur : Esquive les attaques et se rend invisible pendant un tour");
             int perso = demanderEntier("Veuillez entrer le numéro de votre classe :",1,3);
             joueurs[i]= new Joueur(perso,(int)(n*Math.random()),(int)(n*Math.random()), caracteres[i]); // changer la position
@@ -45,7 +45,7 @@ public class JeuDeCombat {
             if(joueurs[principal].peutAttaquer(joueurs)){
                 System.out.println("2) Attaquer");
             }
-            if(nbActions == joueurs[principal].getActions()){ /// Séparer en plusieurs méthode le main est trop lourd
+            if(nbActions>=2){ /// Séparer en plusieurs méthode le main est trop lourd
                 System.out.println("3) Capacité spéciale 1 : "+joueurs[principal].getNomCapacite1()+" (1 fois par tour)");
                 System.out.println("4) Capacité spéciale 2 : "+joueurs[principal].getNomCapacite2()+" (1 fois par tour)");
             }
@@ -71,10 +71,50 @@ public class JeuDeCombat {
                     System.out.println("Impossible d'attaquer ce joueur.");
                     joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",0,joueurs.length-1);
                 }
-                System.out.println("Vous effectuez "+joueurs[principal].attaquer(joueurs[joueurAAttaquer])+" degats.");
+                System.out.println("Vous effectuez "+joueurs[principal].attaquer(joueurs[joueurAAttaquer])+" dégats.");
 
             }else if(action==3){
+                switch(joueurs[principal].getClasse()){
+                    case 1 -> { // Magicien
+                        int joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer, sans tenir compte de votre portée :",0,joueurs.length-1);
+                        System.out.println("Vous effectuez "+joueurs[principal].capacite1Magicien(joueurs[joueurAAttaquer])+" dégâts.");
 
+                    }
+                    case 2 -> { // Guerrier
+                        joueurs[principal].capacite1Guerrier(terrain);
+                        System.out.println("Tous les buissons aux alentours ont été détruits par votre souffle ravageur.");
+
+                    }
+                    case 3 -> { // Voleur
+                        if(!joueurs[principal].peutAttaquer(joueurs)){
+                            System.out.println("Vous ne pouvez attaquer personne.");
+                            break;
+                        }
+                        int joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",0,joueurs.length-1);
+                        while(!joueurs[principal].peutAttaquerJoueur(joueurs[joueurAAttaquer])){
+                            System.out.println("Impossible d'attaquer ce joueur.");
+                            joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",0,joueurs.length-1);
+                        }
+                        System.out.println("Vous effectuez "+joueurs[principal].capacite1Voleur(joueurs[joueurAAttaquer])+" dégâts et gagnez autant en vies.");
+                    }
+                }
+                nbActions--;
+            }else if(action==4){
+                switch (joueurs[principal].getClasse()){
+                    case 1 -> { // Magicien
+                        x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
+                        y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
+                        joueurs[principal].capacite2Magicien(x, y);
+                    }
+                    case 2 -> { // Guerrier
+                        System.out.println("Vous effectuez un total de "+joueurs[principal].capacite2Guerrier(joueurs)+" dégats.");
+                    }
+                    case 3 -> { // Voleur
+                        int joueurAEchanger = demanderEntier("Veuillez entrer le numéro du joueur avec qui vous voulez permuter :",0,joueurs.length-1);
+                        joueurs[principal].capacite2Voleur(joueurs[joueurAEchanger]);
+                    }
+                }
+                nbActions--;
             }
             nbActions--;
         }
@@ -162,7 +202,7 @@ public class JeuDeCombat {
 
     public static char joueurCase(char[][] terrain, Joueur[] joueurs, int x, int y){
         for(int i=0; i<joueurs.length; i++){
-            if((joueurs[i].x == x) && (joueurs[i].y== y) && !joueurs[i].mort){
+            if((joueurs[i].x == x) && (joueurs[i].y== y) && !joueurs[i].mort && !joueurs[i].estCache(terrain)){
                 return joueurs[i].caractere;
             }
         }
@@ -172,7 +212,11 @@ public class JeuDeCombat {
     public static void remplissageTerrain(char terrain [][]){
         for(int i = 0; i<terrain.length; i ++) {
             for (int j = 0; j < terrain[0].length; j++) {
-                terrain[i][j]=' ';
+                if(Math.random()<0.1) {
+                    terrain[i][j]='O';
+                } else {
+                    terrain[i][j]=' ';
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package jeudecombat;
 
+import java.util.Hashtable;
 import java.util.Scanner;
 
 public class Joueur {
@@ -15,7 +16,7 @@ public class Joueur {
 
     public char caractere;
 
-    public boolean cache = false;
+    //public boolean cache = false;
     public boolean mort = false;
 
     private String nomCapacite1;
@@ -37,16 +38,19 @@ public class Joueur {
                 this.portee = 2;
                 this.defense = 10;
                 this.force = 12;
+                this.nomCapacite1 = "Souffle rageur";
+                this.nomCapacite2 = "Vague de dégats";
             }
             case 3 -> { // Voleur
                 this.vie = 10;
                 this.portee = 4;
                 this.defense = 14;
                 this.force = 8;
+                this.nomCapacite1 = "Vol de vie";
+                this.nomCapacite2 = "Vol la position";
             }
         }
         this.caractere = caractere;
-        this.cache = false;
         this.mort = false;
         this.actions = 2;
         this.x = x;
@@ -107,7 +111,11 @@ public class Joueur {
         return nomCapacite2;
     }
 
-    public String getClasse(){
+    public int getClasse(){
+        return this.classe;
+    }
+
+    public String getNomClasse(){
         switch (this.classe){
             case 1 -> {
                 return "Magicien";
@@ -120,6 +128,10 @@ public class Joueur {
             }
         }
         return "indéfini";
+    }
+    
+    public boolean estCache(char[][] terrain){
+        return terrain[y][x]=='O';
     }
 
     // --- Methodes --- //
@@ -139,14 +151,17 @@ public class Joueur {
         return 0;
     }
 
+    public int distance(int x, int y){
+        return Math.abs(x-this.x)+Math.abs(y-this.y);
+    }
+
     /**
      * Vérifie si un joueur donné est attaquable
      * @param joueur le joueur à attaquer
      * @return le joueur est-il attaquable ou non
      */
     public boolean peutAttaquerJoueur(Joueur joueur){
-        int distance = Math.abs(joueur.x-this.x)+Math.abs(joueur.y-this.y);
-        return distance<=this.portee;
+        return this.distance(joueur.x, joueur.y)<=this.portee;
     }
 
     public boolean peutAttaquer(Joueur[] joueurs){
@@ -185,32 +200,54 @@ public class Joueur {
                 return false;
             }
         }
-        int distance = Math.abs(x-this.x)+Math.abs(y-this.y);
-        return distance<=this.portee;
+        return this.distance(x, y)<=this.portee;
     }
 
-//    public void capacite1(){
-//        Scanner sc = new Scanner(System.in);
-//        switch (this.classe){
-//            case 1 -> { // Magicien
-//                System.out.println("Veuillez choisir un joueur à attaquer");
-//
-//            }
-//            case 2 -> {
-//
-//            }
-//            case 3 -> {
-//
-//            }
-//        }
-//    }
+    public int capacite1Magicien(Joueur joueur){
+        return this.attaquer(joueur);
+    }
 
-    public void capacite2(){
+    public void capacite2Magicien(int x, int y){
+        this.seDeplacer(x, y);
+    }
 
+    public void capacite1Guerrier(char[][] terrain){
+        int distance;
+        for(int i=0; i<terrain.length; i++){
+            for(int j=0; j<terrain[i].length; j++){
+                if(terrain[i][j]=='O' && this.distance(j, i)<=5){
+                    terrain[i][j] = ' ';
+                }
+            }
+        }
+    }
+
+    public int capacite2Guerrier(Joueur[] joueurs){
+        int rayon = 5;
+        int total=0;
+        for(int i = 0; i<joueurs.length; i++){
+            if(distance(joueurs[i].x,joueurs[i].y)<rayon && joueurs[i]!= this){
+                total += attaquer(joueurs[i]);
+            }
+        }
+        return total;
+    }
+
+    public int capacite1Voleur(Joueur joueurAttaque){
+        int degats = attaquer(joueurAttaque);
+        this.vie += degats;
+        return degats;
+    }
+
+    public void capacite2Voleur(Joueur joueur){
+        int x = this.x;
+        int y = this.y;
+        this.seDeplacer(joueur.x, joueur.y);
+        joueur.seDeplacer(x, y);
     }
 
     public String toString(){
-        String string = this.getClasse()+" "+this.caractere+"\n 1) Vies : " + this.getVie()+"\n 2) Force : "
+        String string = this.getNomClasse()+" "+this.caractere+"\n 1) Vies : " + this.getVie()+"\n 2) Force : "
                 + this.getForce()+"\n 3) Portée : " + this.getPortee()+"\n 4) Défense : " + this.getDefense()+"\n";
         return string;
     }
