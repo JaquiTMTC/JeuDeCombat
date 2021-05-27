@@ -10,6 +10,7 @@ public class Joueur {
     private int actions;
     private int force;
     private int classe;
+    private int dexterite;
 
     public int x;
     public int y;
@@ -28,24 +29,27 @@ public class Joueur {
             case 1 -> { // Magicien
                 this.vie = 12;
                 this.portee = 3;
-                this.defense = 12;
+                this.defense = 10;
                 this.force = 8;
+                this.dexterite = 12;
                 this.nomCapacite1 = "Attaque à distance";
                 this.nomCapacite2 = "Fuite tactique";
             }
             case 2 -> { // Guerrier
                 this.vie = 15;
                 this.portee = 2;
-                this.defense = 10;
+                this.defense = 8;
                 this.force = 12;
+                this.dexterite = 10;
                 this.nomCapacite1 = "Souffle rageur";
                 this.nomCapacite2 = "Vague de dégats";
             }
             case 3 -> { // Voleur
                 this.vie = 10;
                 this.portee = 4;
-                this.defense = 14;
+                this.defense = 12;
                 this.force = 8;
+                this.dexterite = 14;
                 this.nomCapacite1 = "Vol de vie";
                 this.nomCapacite2 = "Vol la position";
             }
@@ -99,6 +103,16 @@ public class Joueur {
         }
     }
 
+    public int getDexterite() {
+        return dexterite;
+    }
+
+    public void setDexterite(int dexterite) {
+        if (dexterite >= 0) {
+            this.dexterite = dexterite;
+        }
+    }
+
     public int getActions() {
         return actions;
     }
@@ -141,8 +155,8 @@ public class Joueur {
      * @param joueur joueur à attaquer
      */
     public int attaquer(Joueur joueur){
-        De deDegats = new De(5, 5); /// ajouter force
-        De deAttaque = new De(20, 5); // modifier selon attributs joueur
+        De deDegats = new De(5, this.force/4);
+        De deAttaque = new De(20, this.dexterite/2);
         if(deAttaque.lancer()>joueur.defense){
             int degats = deDegats.lancer();
             joueur.prendreDegats(degats);
@@ -187,6 +201,16 @@ public class Joueur {
         this.y = y;
     }
 
+    public void placementAleatoire(char[][] terrain, Joueur[] joueurs){
+        int n = terrain.length;
+        int x, y;
+        do {
+            x = (int)(Math.random()*n);
+            y = (int)(Math.random()*n);
+        } while(terrain[y][x]=='O' || !peutSeDeplacer(joueurs, x, y));
+        this.seDeplacer(x, y);
+    }
+
     /**
      * Vérifie si le joueur peut se déplacer aux coordonnées données
      * @param joueurs liste des joueurs sur le terrain
@@ -194,13 +218,13 @@ public class Joueur {
      * @param y coordonnées y du point d'arrivée
      * @return le joueur peut ou non se deplacer
      */
-    public boolean peutSeDeplacer(Joueur[] joueurs, int x, int y){
-        for(int i=0; i<joueurs.length; i++){
-            if(joueurs[i] != this && joueurs[i].x == x && joueurs[i].y == y){
+    public boolean peutSeDeplacer(Joueur[] joueurs, int x, int y) {
+        for (int i = 0; i < joueurs.length; i++) {
+            if (joueurs[i] != this && joueurs[i].x == x && joueurs[i].y == y) {
                 return false;
             }
         }
-        return this.distance(x, y)<=this.portee;
+        return this.distance(x, y) <= this.portee;
     }
 
     public int capacite1Magicien(Joueur joueur){
@@ -247,8 +271,10 @@ public class Joueur {
     }
 
     public String toString(){
-        String string = this.getNomClasse()+" "+this.caractere+"\n 1) Vies : " + this.getVie()+"\n 2) Force : "
-                + this.getForce()+"\n 3) Portée : " + this.getPortee()+"\n 4) Défense : " + this.getDefense()+"\n";
+        String string = this.getNomClasse()+" de symbole " + this.caractere + "\n 1) Vie : " + this.vie+"\n 2) Force : "
+                + this.force+"\n 3) Portée : " + this.portee+"\n 4) Défense : " + this.defense
+                +"\n 5) Dexterité : " + this.dexterite;
+
         return string;
     }
 }
