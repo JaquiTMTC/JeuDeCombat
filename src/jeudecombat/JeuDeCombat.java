@@ -39,7 +39,7 @@ public class JeuDeCombat {
     }
 
     public static void instruction() {
-        int res = demanderEntier("Voulez vous les instructions de ce jeu ? \n Entrez 0 pour \"oui\" et 1 pour \"non\".", 0,1);
+        int res = demanderEntier("Voulez vous les règles du jeu ? \n Entrez 0 pour \"oui\" et 1 pour \"non\".", 0,1);
         if(res == 0){
             System.out.println("Instructions du jeu de combat :\n - Début de partie : \n Vous entrez le nombre de joueurs (entre 2 et 4) ainsi que la taille du terrain. Chaque joueur peut choisir un personnage parmi : le Magicien, le Guerrier et le Voleur. Les joueurs apparaissent sur le terrain avec les symboles : @ (joueur 1), # (joueur 2), & (joueur 3), # (joueur 4). Chaque joueur possède un pouvoir particulier qui vous sera expliqué au moment de choisir votre personnage. Vous avez ensuite accès aux statistiques du joueur : nombres de vies, portée, défense, force, dextérité. Vous pouvez alors répartir 5 points supplémentaires dans ces statistiques. \n - Déroulement du tour : \n A chaque tour, le joueur peut soit réaliser deux actions entre \"se déplacer et attaquer\", soit utiliser une de ses capacités spéciales. \n - Fin du jeu :\n Le gagnant est le dernier joueur à rester en vie. ");
             System.out.println("/!\\ Petit plus : Vous pouvez vous cacher sous des buissons, posés aléatoirement sur le plateau. Ils sont représentés par des O.");
