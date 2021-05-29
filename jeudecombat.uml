@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>C:/Users/Alix/Documents/INSA/Informatique/JeuDeCombat/out/production/JeuDeCombat/jeudecombat</OriginalElement>
+  <nodes>
+    <node x="319.0" y="0.0">jeudecombat.JeuDeCombat</node>
+    <node x="0.0" y="0.0">jeudecombat.Joueur</node>
+    <node x="659.0" y="0.0">jeudecombat.De</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="83.0" y="92.0" />
+  <SelectedNodes>
+    <node>jeudecombat.Joueur</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+
