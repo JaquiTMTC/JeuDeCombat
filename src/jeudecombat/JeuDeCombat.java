@@ -1,11 +1,24 @@
 package jeudecombat;
 
 import java.util.Scanner;
+
 public class JeuDeCombat {
     static Scanner scanner = new Scanner( System.in );
     public static void main(String[] args) {
         char[] caracteres = {'@', '#', '&', '$'};
-        // --- Initialisation du jeu ---
+        // --- Bienvenue --- //
+        System.out.println(
+                "_________ _______               ______   _______      _______  _______  _______  ______   _______ _________\n" +
+                "\\__    _/(  ____ \\|\\     /|    (  __  \\ (  ____ \\    (  ____ \\(  ___  )(       )(  ___ \\ (  ___  )\\__   __/\n" +
+                "   )  (  | (    \\/| )   ( |    | (  \\  )| (    \\/    | (    \\/| (   ) || () () || (   ) )| (   ) |   ) (   \n" +
+                "   |  |  | (__    | |   | |    | |   ) || (__        | |      | |   | || || || || (__/ / | (___) |   | |   \n" +
+                "   |  |  |  __)   | |   | |    | |   | ||  __)       | |      | |   | || |(_)| ||  __ (  |  ___  |   | |   \n" +
+                "   |  |  | (      | |   | |    | |   ) || (          | |      | |   | || |   | || (  \\ \\ | (   ) |   | |   \n" +
+                "|\\_)  )  | (____/\\| (___) |    | (__/  )| (____/\\    | (____/\\| (___) || )   ( || )___) )| )   ( |   | |   \n" +
+                "(____/   (_______/(_______)    (______/ (_______/    (_______/(_______)|/     \\||/ \\___/ |/     \\|   )_(   \n"
+        );
+
+        // --- Initialisation du jeu --- //
         instruction();
         int nbJoueurs = demanderEntier("Combien de joueurs êtes-vous ?",2,4);
         Joueur[] joueurs = new Joueur[nbJoueurs];
@@ -21,13 +34,19 @@ public class JeuDeCombat {
         for(int i=0; i<joueurs.length; i++){
             joueurs[i].placementAleatoire(terrain, joueurs);
         }
+
+        // --- Jeu --- //
         while(!fini(joueurs)){
             for(int i=0; i<joueurs.length; i++){
                 tour(joueurs, i, terrain);
             }
         }
+
+        // --- Fin ---
         finPartie(trouverGagnant(joueurs));
     }
+
+    // --- Methodes d'interaction avec les utilisateurs --- //
 
     public static Joueur creerJoueur(char caractere, int i) {
         System.out.println("Joueur " + (i+1) + ", c'est à vous de choisir votre personnage."); /// Changer l'affichage des joueurs
@@ -46,40 +65,82 @@ public class JeuDeCombat {
         }
     }
 
+    public static void modifStat(Joueur joueur){
+        int nbPoints = 5;
+        int stat;
+        int points;
+        System.out.println("Vous pouvez maintenant répartir "+ nbPoints + " points dans vos statistiques.");
+        while(nbPoints>0){
+            System.out.println("Voici vos statistiques : \n"+joueur);
+            stat = demanderEntier("Veuillez choisir le numéro de la statistique auquel vous voulez ajouter des points.", 1,5);
+            points = demanderEntier("Combien de points voulez-vous ajouter à cette statistique ?",1,nbPoints);
+            switch (stat) {
+                case 1 -> {
+                    joueur.setVie(joueur.getVie() + points);
+                }
+                case 2 -> {
+                    joueur.setForce(joueur.getForce() + points);
+                }
+                case 3 -> {
+                    joueur.setPortee(joueur.getPortee() + points);
+                }
+                case 4 -> {
+                    joueur.setDefense(joueur.getDefense() + points);
+                }
+                case 5 -> {
+                    joueur.setDexterite(joueur.getDexterite() + points);
+                }
+            }
+            nbPoints -= points;
+            if(nbPoints != 0){
+                System.out.println("Vous pouvez encore répartir "+nbPoints+" points.");
+            }
+        }
+        System.out.println("Vous avez maintenant fini de répartir vos points. Et maintenant, place au jeu !");
+    }
+
     public static void tour(Joueur[] joueurs, int principal, char[][] terrain) {
         int nbActions = joueurs[principal].getActions();
-        int x;
-        int y;
-        int n = terrain.length;
-        afficherJeu(terrain, joueurs);
-        afficherStats(joueurs);
         while(nbActions!=0 && !fini(joueurs)){
+            afficherJeu(terrain, joueurs);
+            afficherStats(joueurs);
+            int actionMax = 1;
+            int actionAttaque = 0;
+            int actionSpe1 = 0;
+            int actionSpe2 = 0;
             System.out.println("Joueur "+ (principal+1) +", veuillez choisir une action :");
             System.out.println("1) Se déplacer");
             if(joueurs[principal].peutAttaquer(joueurs)){
+                actionMax++;
+                actionAttaque = actionMax;
                 System.out.println("2) Attaquer");
             }
             if(nbActions>=2){
-                System.out.println("3) Capacité spéciale 1 : "+joueurs[principal].getNomCapacite1()+" (1 fois par tour)");
-                System.out.println("4) Capacité spéciale 2 : "+joueurs[principal].getNomCapacite2()+" (1 fois par tour)");
+                actionMax++;
+                actionSpe1 = actionMax;
+                System.out.println(actionMax+") Capacité spéciale : "+joueurs[principal].getNomCapacite1()+" (1 fois par tour)");
+                actionMax++;
+                actionSpe2 = actionMax;
+                System.out.println(actionMax+") Capacité spéciale : "+joueurs[principal].getNomCapacite2()+" (1 fois par tour)");
             }
-            int action = demanderEntier("Veuillez entrer le numéro de l'action que vous souhaitez réaliser :",1,4);
+            int action = demanderEntier("Veuillez entrer le numéro de l'action que vous souhaitez réaliser :",1,actionMax);
             if(action==1){
                 deplacement(joueurs, principal, terrain);
                 nbActions--;
 
-            }else if(action==2){
+            }else if(action==actionAttaque){
                 nbActions = attaque(joueurs, principal, nbActions);
 
-            }else if(action==3){
+            }else if(action==actionSpe1){
                 nbActions = capaciteSpeciale1(joueurs, principal, terrain, nbActions);
 
-            }else if(action==4){
+            }else if(action==actionSpe2){
                 capaciteSpeciale2(joueurs, principal, terrain);
                 nbActions-=2;
             }
         }
     }
+
     // --- Méthodes correspondant à chaque action ---//
 
     public static void deplacement(Joueur[] joueurs, int principal, char[][] terrain){
@@ -94,7 +155,6 @@ public class JeuDeCombat {
             y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
         }
         joueurs[principal].seDeplacer(x, y);
-        afficherJeu(terrain, joueurs);
     }
 
     public static int attaque(Joueur[] joueurs, int principal, int nbActions){
@@ -148,6 +208,11 @@ public class JeuDeCombat {
                 System.out.println("Vous pouvez maintenant vous téléporter !!!");
                 x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
                 y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
+                while(trouverJoueur(joueurs, x, y)){
+                    System.out.println("Vous ne pouvez pas vous déplacer ici");
+                    x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
+                    y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
+                }
                 joueurs[principal].capacite2Magicien(x, y);
             }
             case 2 -> { // Guerrier
@@ -160,6 +225,8 @@ public class JeuDeCombat {
         }
     }
 
+    // --- Méthodes d'affichage --- //
+
     public static void afficherStats(Joueur[] joueurs){
         for(int i=0; i<joueurs.length; i++) {
             if(joueurs[i].getVie()>0) {
@@ -171,38 +238,41 @@ public class JeuDeCombat {
         }
     }
 
-    public static void modifStat(Joueur joueur){
-        int nbPoints = 5;
-        int stat;
-        int points;
-        System.out.println("Vous pouvez maintenant répartir "+ nbPoints + " points dans vos statistiques.");
-        while(nbPoints>0){
-            System.out.println("Voici vos statistiques : \n"+joueur);
-            stat = demanderEntier("Veuillez choisir le numéro de la statistique auquel vous voulez ajouter des points.", 1,5);
-            points = demanderEntier("Combien de points voulez-vous ajouter à cette statistique ?",1,nbPoints);
-            switch (stat) {
-                case 1 -> {
-                    joueur.setVie(joueur.getVie() + points);
-                }
-                case 2 -> {
-                    joueur.setForce(joueur.getForce() + points);
-                }
-                case 3 -> {
-                    joueur.setPortee(joueur.getPortee() + points);
-                }
-                case 4 -> {
-                    joueur.setDefense(joueur.getDefense() + points);
-                }
-                case 5 -> {
-                    joueur.setDexterite(joueur.getDexterite() + points);
-                }
+    private static void finPartie(int gagnant) {
+        System.out.println("Joueur "+ (gagnant+1) +", vous avez triomphé de tous vos adversaires les plus coriaces !");
+    }
+
+    public static void afficherJeu(char terrain [][], Joueur joueurs[]) {
+        System.out.print("| |");
+        for (int i = 0; i < terrain[0].length; i++) {
+            System.out.print(i+"|");
+        }
+        System.out.println();
+        for(int i=0; i<terrain.length; i ++){ // parcourt les lignes
+            System.out.print("|"+i+"|");
+            for(int j=0; j<terrain[0].length; j++){ // parcours les colonnes
+                System.out.print(joueurCase(terrain, joueurs, j, i) + "|");
             }
-            nbPoints -= points;
-            if(nbPoints != 0){
-                System.out.println("Vous pouvez encore répartir "+nbPoints+" points.");
+            System.out.println();
+        }
+    }
+
+    // --- Méthodes diverses --- //
+
+    /**
+     * Cherche si un joueur est présent à la position donnée
+     * @param joueurs Liste des joueurs
+     * @param x
+     * @param y
+     * @return Joueur présent ou non
+     */
+    private static boolean trouverJoueur(Joueur[] joueurs, int x, int y) {
+        for(int i=0; i<joueurs.length; i++){
+            if(joueurs[i].x == x && joueurs[i].y == y){
+                return true;
             }
         }
-        System.out.println("Vous avez maintenant fini de répartir vos points.");
+        return false;
     }
 
     public static boolean fini(Joueur[] joueurs) {
@@ -227,25 +297,14 @@ public class JeuDeCombat {
         return -1;
     }
 
-    private static void finPartie(int gagnant) {
-        System.out.println("Joueur "+ (gagnant+1) +", vous avez triomphé de tous vos adversaires les plus coriaces !");
-    }
-
-    public static void afficherJeu(char terrain [][], Joueur joueurs[]) {
-        System.out.print("| |");
-        for (int i = 0; i < terrain[0].length; i++) {
-            System.out.print(i+"|");
-        }
-        System.out.println();
-        for(int i=0; i<terrain.length; i ++){ // parcourt les lignes
-            System.out.print("|"+i+"|");
-            for(int j=0; j<terrain[0].length; j++){ // parcours les colonnes
-                System.out.print(joueurCase(terrain, joueurs, j, i) + "|");
-            }
-            System.out.println();
-        }
-    }
-
+    /**
+     * Pour une case donnée, renvoie sa représentation pour les utilisateurs selon qu'un joueur y soit présent ou non
+     * @param terrain
+     * @param joueurs
+     * @param x
+     * @param y
+     * @return la représentation de la case du derrain
+     */
     public static char joueurCase(char[][] terrain, Joueur[] joueurs, int x, int y){
         for(int i=0; i<joueurs.length; i++){
             if((joueurs[i].x == x) && (joueurs[i].y== y) && !joueurs[i].mort && !joueurs[i].estCache(terrain)){
@@ -267,11 +326,12 @@ public class JeuDeCombat {
         }
     }
 
-    /**Demander à l'interlocuteur un entier entre min et max (compris)
-     * @param question
-     * @param min
-     * @param max
-     * @return
+    /**
+     * Demande à l'utilisateur un entier entre min et max
+     * @param question Question à poser à l'utilisateur
+     * @param min Minimum accepté (compris)
+     * @param max Maximum accepté (compris)
+     * @return La réponse de l'utilisateur
      */
     public static int demanderEntier(String question, int min, int max){
         System.out.println(question + " (nombre entre "+min+" et "+max+")");
@@ -283,35 +343,3 @@ public class JeuDeCombat {
         return reponse;
     }
 }
-
-
-//import java.awt.*;
-//import java.awt.event.WindowAdapter;
-//import java.awt.event.WindowEvent;
-//
-//public class JeuDeCombat extends Frame{
-//
-//    public JeuDeCombat(){
-//        super();
-//        prepareGUI();
-//    }
-//
-//    private void prepareGUI() {
-//        setSize(400, 400);
-//        addWindowListener(new WindowAdapter() {
-//            public void windowClosing(WindowEvent windowEvent){
-//                System.exit(0);
-//            }
-//        });
-//    }
-//
-//    public static void main(String[] args){
-//        JeuDeCombat jeuDeCombat = new JeuDeCombat();
-//        jeuDeCombat.setVisible(true);
-//    }
-//
-//    //@Override
-//    public void paint(Graphics g){
-//        g.drawString("YOOOOO", 50, 150);
-//    }
-//}

@@ -1,15 +1,12 @@
 package jeudecombat;
 
-import java.util.Hashtable;
-import java.util.Scanner;
-
 public class Joueur {
     private int vie;
     private int portee;
     private int defense;
     private int actions;
     private int force;
-    private int classe;
+    private final int classe;
     private int dexterite;
 
     public int x;
@@ -28,7 +25,7 @@ public class Joueur {
         switch (classe) {
             case 1 -> { // Magicien
                 this.vie = 12;
-                this.portee = 3;
+                this.portee = 5;
                 this.defense = 10;
                 this.force = 8;
                 this.dexterite = 12;
@@ -37,7 +34,7 @@ public class Joueur {
             }
             case 2 -> { // Guerrier
                 this.vie = 15;
-                this.portee = 2;
+                this.portee = 4;
                 this.defense = 8;
                 this.force = 12;
                 this.dexterite = 10;
@@ -46,7 +43,7 @@ public class Joueur {
             }
             case 3 -> { // Voleur
                 this.vie = 10;
-                this.portee = 4;
+                this.portee = 6;
                 this.defense = 12;
                 this.force = 8;
                 this.dexterite = 14;
@@ -151,7 +148,7 @@ public class Joueur {
     // --- Methodes --- //
 
     /**
-     * Methode a appeler pour attaquer un joueur
+     * Attaque le joueur passé en paramètres
      * @param joueur joueur à attaquer
      */
     public int attaquer(Joueur joueur){
@@ -165,6 +162,21 @@ public class Joueur {
         return 0;
     }
 
+    /**
+     * Donne la distance de manhattan entre le joueur donné et 'this'
+     * @param joueur
+     * @return La distance de manhattan entre le joueur donné et 'this'
+     */
+    public int distance(Joueur joueur){
+        return distance(joueur.x, joueur.y);
+    }
+
+    /**
+     * Donne la distance de manhattan entre la position donnée et le joueur
+     * @param x Position x
+     * @param y Position y
+     * @return La distance de manhattan entre la position donnée et le joueur
+     */
     public int distance(int x, int y){
         return Math.abs(x-this.x)+Math.abs(y-this.y);
     }
@@ -175,9 +187,14 @@ public class Joueur {
      * @return le joueur est-il attaquable ou non
      */
     public boolean peutAttaquerJoueur(Joueur joueur){
-        return this.distance(joueur.x, joueur.y)<=this.portee;
+        return this.distance(joueur)<=this.portee;
     }
 
+    /**
+     * Vérifie que le joueur peut attaquer au moins une autre personne
+     * @param joueurs Liste des joeurs
+     * @return Si le joueur peut attaquer ou non
+     */
     public boolean peutAttaquer(Joueur[] joueurs){
         for(int i=0; i<joueurs.length; i++){
             if(this.peutAttaquerJoueur(joueurs[i]) && this != joueurs[i]){
@@ -201,13 +218,25 @@ public class Joueur {
         this.y = y;
     }
 
+    /**
+     * Place aléatoirement le joueur sur une position valide (pas d'autre joueur, pas de buisson)
+     * @param terrain
+     * @param joueurs
+     */
     public void placementAleatoire(char[][] terrain, Joueur[] joueurs){
         int n = terrain.length;
         int x, y;
+        boolean joueurPos = false;
         do {
             x = (int)(Math.random()*n);
             y = (int)(Math.random()*n);
-        } while(terrain[y][x]=='O' || !peutSeDeplacer(joueurs, x, y));
+            for(int i=0; i< joueurs.length; i++){
+                if(joueurs[i].x == x && joueurs[i].y == y){
+                    joueurPos = true;
+                    break;
+                }
+            }
+        } while(terrain[y][x]=='O' || joueurPos);
         this.seDeplacer(x, y);
     }
 
@@ -239,7 +268,7 @@ public class Joueur {
         int distance;
         for(int i=0; i<terrain.length; i++){
             for(int j=0; j<terrain[i].length; j++){
-                if(terrain[i][j]=='O' && this.distance(j, i)<=5){
+                if(terrain[i][j]=='O' && this.distance(j, i)<=4){
                     terrain[i][j] = ' ';
                 }
             }
@@ -247,10 +276,9 @@ public class Joueur {
     }
 
     public int capacite2Guerrier(Joueur[] joueurs){
-        int rayon = 5;
         int total=0;
         for(int i = 0; i<joueurs.length; i++){
-            if(distance(joueurs[i].x,joueurs[i].y)<rayon && joueurs[i]!= this){
+            if(distance(joueurs[i])<4 && joueurs[i]!= this){
                 total += attaquer(joueurs[i]);
             }
         }
