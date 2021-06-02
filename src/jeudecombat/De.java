@@ -8,7 +8,12 @@ public class De {
         this.taille = taille;
         this.modificateur = modificateur;
     }
+
+    /**
+     * Lance un dé de taille "taille"
+     * @return (entier entre 1 et taille)+modificateur
+     */
     public int lancer(){
-        return (int)(Math.random()*(this.taille+1))+ modificateur;
+        return (int)(Math.random()*this.taille+1)+ modificateur;
     }
 }

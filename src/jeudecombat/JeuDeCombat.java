@@ -23,7 +23,7 @@ public class JeuDeCombat {
         int nbJoueurs = demanderEntier("Combien de joueurs êtes-vous ?",2,4);
         Joueur[] joueurs = new Joueur[nbJoueurs];
 
-        int n = demanderEntier("Veuillez entre la taille de votre terrain (entrez un entier):", 7,15);
+        int n = demanderEntier("Veuillez entrer la taille de votre terrain (entrez un entier):", 7,15);
         char[][] terrain = new char [n][n];
         remplissageTerrain(terrain);
 
@@ -113,7 +113,7 @@ public class JeuDeCombat {
         while(nbActions!=0 && !fini(joueurs)){
             afficherJeu(terrain, joueurs);
             afficherStats(joueurs);
-            int actionMax = 1;
+            int actionMax = 1; // nombre de possibilités d'action
             int actionAttaque = 0;
             int actionSpe1 = 0;
             int actionSpe2 = 0;
@@ -133,18 +133,18 @@ public class JeuDeCombat {
                 System.out.println(actionMax+") Capacité spéciale : "+joueurs[principal].getNomCapacite2()+" (1 fois par tour)");
             }
             int action = demanderEntier("Veuillez entrer le numéro de l'action que vous souhaitez réaliser :",1,actionMax);
-            if(action==1){
+            if(action==1){ // deplacer
                 deplacement(joueurs, principal, terrain);
                 nbActions--;
 
-            }else if(action==actionAttaque){
+            }else if(action==actionAttaque){ // attaquer
                 attaque(joueurs, principal);
                 nbActions--;
 
-            }else if(action==actionSpe1){
+            }else if(action==actionSpe1){ // capacite 1
                 nbActions = capaciteSpeciale1(joueurs, principal, terrain, nbActions);
 
-            }else if(action==actionSpe2){
+            }else if(action==actionSpe2){ // capacite 2
                 capaciteSpeciale2(joueurs, principal, terrain);
                 nbActions-=2;
             }
@@ -233,6 +233,10 @@ public class JeuDeCombat {
 
     // --- Méthodes d'affichage --- //
 
+    /**
+     * Affiche le toString de chaque joueur de la liste
+     * @param joueurs
+     */
     public static void afficherStats(Joueur[] joueurs){
         for(int i=0; i<joueurs.length; i++) {
             if(joueurs[i].getVie()>0) {
@@ -281,6 +285,11 @@ public class JeuDeCombat {
         return false;
     }
 
+    /**
+     * Vérifie si la partie est finie (plus qu'1 joueur vivant
+     * @param joueurs
+     * @return La partie est-elle finie ou non
+     */
     public static boolean fini(Joueur[] joueurs) {
         int vivant = 0;
         for(int i=0; i<joueurs.length; i++){
@@ -325,10 +334,14 @@ public class JeuDeCombat {
         return terrain[y][x];
     }
 
+    /**
+     * Remplit le terrain vide et place aléatoirement des buissons dans le terrain
+     * @param terrain
+     */
     public static void remplissageTerrain(char terrain[][]){
         for(int i = 0; i<terrain.length; i ++) {
             for (int j = 0; j < terrain[0].length; j++) {
-                if(Math.random()<0.1) {
+                if(Math.random()<0.15) {
                     terrain[i][j]='O';
                 } else {
                     terrain[i][j]=' ';

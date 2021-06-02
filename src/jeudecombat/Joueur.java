@@ -287,6 +287,10 @@ public class Joueur {
         this.seDeplacer(x, y);
     }
 
+    /**
+     * Détruit tous les buissons dans un rayon de 4 autour du guerrier
+     * @param terrain
+     */
     public void capacite1Guerrier(char[][] terrain){
         int distance;
         for(int i=0; i<terrain.length; i++){
@@ -314,9 +318,9 @@ public class Joueur {
     }
 
     /**
-     * Vol de vie à un joueur qu'on attaque
-     * @param joueur
-     * @return
+     * Vol de vie à un joueur qu'on attaque.
+     * @param joueur Le joueur à attaquer
+     * @return Les dégâts faits
      */
     public int capacite1Voleur(Joueur joueur){
         int degats = attaquer(joueur);
@@ -324,6 +328,10 @@ public class Joueur {
         return degats;
     }
 
+    /**
+     * On échange de position avec un joueur
+     * @param joueur Le joueur avec qui changer de position
+     */
     public void capacite2Voleur(Joueur joueur){
         int x = this.x;
         int y = this.y;
@@ -334,7 +342,7 @@ public class Joueur {
     public String toString(){
         String string = this.nomClasse()+" de symbole " + this.caractere + "\n 1) Vie : " + this.vie+"\n 2) Force : "
                 + this.force+"\n 3) Portée : " + this.portee+"\n 4) Défense : " + this.defense
-                +"\n 5) Dexterité : " + this.dexterite;
+                +"\n 5) Dextérité : " + this.dexterite;
 
         return string;
     }
