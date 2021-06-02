@@ -12,10 +12,10 @@ public class Joueur {
     public int x;
     public int y;
 
-    public char caractere;
+    public final char caractere;
 
     //public boolean cache = false;
-    public boolean mort = false;
+    private boolean mort = false;
 
     private String nomCapacite1;
     private String nomCapacite2;
@@ -126,7 +126,13 @@ public class Joueur {
         return this.classe;
     }
 
-    public String getNomClasse(){
+    public boolean getMort(){
+        return mort;
+    }
+
+    // --- Methodes --- //
+
+    public String nomClasse(){
         switch (this.classe){
             case 1 -> {
                 return "Magicien";
@@ -140,16 +146,11 @@ public class Joueur {
         }
         return "indéfini";
     }
-    
-    public boolean estCache(char[][] terrain){
-        return terrain[y][x]=='O';
-    }
-
-    // --- Methodes --- //
 
     /**
-     * Attaque le joueur passé en paramètres
-     * @param joueur joueur à attaquer
+     * Attaque le joueur passé en paramètres.
+     * @param joueur Joueur à attaquer
+     * @return Les dégâts effectués
      */
     public int attaquer(Joueur joueur){
         De deDegats = new De(5, this.force/4);
@@ -204,6 +205,10 @@ public class Joueur {
         return false;
     }
 
+    /**
+     * Methode à appeler pour que le personnage prenne des dégats
+     * @param degats les dégats à appliquer
+     */
     private void prendreDegats(int degats) {
         if(this.vie>degats){
             this.vie -= degats;
@@ -216,6 +221,10 @@ public class Joueur {
     public void seDeplacer(int x, int y){
         this.x = x;
         this.y = y;
+    }
+
+    public boolean estCache(char[][] terrain){
+        return terrain[y][x]=='O';
     }
 
     /**
@@ -243,11 +252,15 @@ public class Joueur {
     /**
      * Vérifie si le joueur peut se déplacer aux coordonnées données
      * @param joueurs liste des joueurs sur le terrain
+     * @param terrain
      * @param x coordonnées x du point d'arrivée
      * @param y coordonnées y du point d'arrivée
      * @return le joueur peut ou non se deplacer
      */
-    public boolean peutSeDeplacer(Joueur[] joueurs, int x, int y) {
+    public boolean peutSeDeplacer(Joueur[] joueurs, char[][] terrain, int x, int y) {
+        if (x < 0 || y < 0 || x >= terrain.length || y >= terrain.length) {
+            return false;
+        }
         for (int i = 0; i < joueurs.length; i++) {
             if (joueurs[i] != this && joueurs[i].x == x && joueurs[i].y == y) {
                 return false;
@@ -256,10 +269,20 @@ public class Joueur {
         return this.distance(x, y) <= this.portee;
     }
 
+    /**
+     * Attaque un joueur se tenir compte de la portée
+     * @param joueur Le joueur à attaquer
+     * @return les dégats effectués
+     */
     public int capacite1Magicien(Joueur joueur){
         return this.attaquer(joueur);
     }
 
+    /**
+     * Se déplacer sans tenir compte de la portée
+     * @param x
+     * @param y
+     */
     public void capacite2Magicien(int x, int y){
         this.seDeplacer(x, y);
     }
@@ -275,6 +298,11 @@ public class Joueur {
         }
     }
 
+    /**
+     * Attaque tous les joueurs dans un rayon de 4
+     * @param joueurs Liste des joueurs
+     * @return Total des dégâts effectués
+     */
     public int capacite2Guerrier(Joueur[] joueurs){
         int total=0;
         for(int i = 0; i<joueurs.length; i++){
@@ -285,9 +313,14 @@ public class Joueur {
         return total;
     }
 
-    public int capacite1Voleur(Joueur joueurAttaque){
-        int degats = attaquer(joueurAttaque);
-        this.vie += degats;
+    /**
+     * Vol de vie à un joueur qu'on attaque
+     * @param joueur
+     * @return
+     */
+    public int capacite1Voleur(Joueur joueur){
+        int degats = attaquer(joueur);
+        this.vie += (int)Math.ceil((double)degats/2);
         return degats;
     }
 
@@ -299,7 +332,7 @@ public class Joueur {
     }
 
     public String toString(){
-        String string = this.getNomClasse()+" de symbole " + this.caractere + "\n 1) Vie : " + this.vie+"\n 2) Force : "
+        String string = this.nomClasse()+" de symbole " + this.caractere + "\n 1) Vie : " + this.vie+"\n 2) Force : "
                 + this.force+"\n 3) Portée : " + this.portee+"\n 4) Défense : " + this.defense
                 +"\n 5) Dexterité : " + this.dexterite;
 

@@ -3,7 +3,7 @@ package jeudecombat;
 import java.util.Scanner;
 
 public class JeuDeCombat {
-    static Scanner scanner = new Scanner( System.in );
+    static private final Scanner scanner = new Scanner( System.in );
     public static void main(String[] args) {
         char[] caracteres = {'@', '#', '&', '$'};
         // --- Bienvenue --- //
@@ -60,8 +60,17 @@ public class JeuDeCombat {
     public static void instruction() {
         int res = demanderEntier("Voulez vous les règles du jeu ? \n Entrez 0 pour \"oui\" et 1 pour \"non\".", 0,1);
         if(res == 0){
-            System.out.println("Instructions du jeu de combat :\n - Début de partie : \n Vous entrez le nombre de joueurs (entre 2 et 4) ainsi que la taille du terrain. Chaque joueur peut choisir un personnage parmi : le Magicien, le Guerrier et le Voleur. Les joueurs apparaissent sur le terrain avec les symboles : @ (joueur 1), # (joueur 2), & (joueur 3), # (joueur 4). Chaque joueur possède un pouvoir particulier qui vous sera expliqué au moment de choisir votre personnage. Vous avez ensuite accès aux statistiques du joueur : nombres de vies, portée, défense, force, dextérité. Vous pouvez alors répartir 5 points supplémentaires dans ces statistiques. \n - Déroulement du tour : \n A chaque tour, le joueur peut soit réaliser deux actions entre \"se déplacer et attaquer\", soit utiliser une de ses capacités spéciales. \n - Fin du jeu :\n Le gagnant est le dernier joueur à rester en vie. ");
-            System.out.println("/!\\ Petit plus : Vous pouvez vous cacher sous des buissons, posés aléatoirement sur le plateau. Ils sont représentés par des O.");
+            System.out.println("Instructions du jeu de combat :\n - Début de partie : \n Vous entrez le nombre de joueurs" +
+                    " (entre 2 et 4) ainsi que la taille du terrain. Chaque joueur peut choisir un personnage parmi :\n " +
+                    "le Magicien, le Guerrier et le Voleur. \n Les joueurs apparaissent sur le terrain avec les symboles : " +
+                    "@ (joueur 1), # (joueur 2), & (joueur 3), # (joueur 4). \n Chaque joueur possède un pouvoir " +
+                    "particulier qui vous sera expliqué au moment de choisir votre personnage. Vous avez ensuite accès " +
+                    "aux statistiques du joueur : nombres de vies, portée, défense, force, dextérité. Vous pouvez alors " +
+                    "répartir 5 points supplémentaires dans ces statistiques. \n - Déroulement du tour : \n A chaque tour, " +
+                    "le joueur peut soit réaliser deux actions entre \"se déplacer et attaquer\", soit utiliser une de " +
+                    "ses capacités spéciales. \n - Fin du jeu :\n Le gagnant est le dernier joueur à rester en vie. "+
+                    "/!\\ Petit plus : Vous pouvez vous cacher sous des buissons, posés aléatoirement sur le plateau."+
+                    "Ils sont représentés par des O.");
         }
     }
 
@@ -129,7 +138,8 @@ public class JeuDeCombat {
                 nbActions--;
 
             }else if(action==actionAttaque){
-                nbActions = attaque(joueurs, principal, nbActions);
+                attaque(joueurs, principal);
+                nbActions--;
 
             }else if(action==actionSpe1){
                 nbActions = capaciteSpeciale1(joueurs, principal, terrain, nbActions);
@@ -149,7 +159,7 @@ public class JeuDeCombat {
         int n = terrain.length;
         x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
         y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
-        while (!joueurs[principal].peutSeDeplacer(joueurs, x, y)) {
+        while (!joueurs[principal].peutSeDeplacer(joueurs, terrain, x, y)) {
             System.out.println("Impossible de se déplacer à cet endroit. Veuillez choisir une autre location.");
             x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
             y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
@@ -157,18 +167,13 @@ public class JeuDeCombat {
         joueurs[principal].seDeplacer(x, y);
     }
 
-    public static int attaque(Joueur[] joueurs, int principal, int nbActions){
-        if(!joueurs[principal].peutAttaquer(joueurs)){
-            System.out.println("Vous ne pouvez attaquer personne.");
-            return nbActions;
-        }
+    public static void attaque(Joueur[] joueurs, int principal){
         int joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",1,joueurs.length)-1;
         while(!joueurs[principal].peutAttaquerJoueur(joueurs[joueurAAttaquer])){
             System.out.println("Impossible d'attaquer ce joueur.");
             joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",1,joueurs.length)-1;
         }
         System.out.println("Vous avez effectué "+joueurs[principal].attaquer(joueurs[joueurAAttaquer])+" dégats.");
-        return nbActions-1;
     }
 
     public static int capaciteSpeciale1(Joueur[] joueurs, int principal, char[][] terrain, int nbActions){
@@ -193,7 +198,8 @@ public class JeuDeCombat {
                     System.out.println("Impossible d'attaquer ce joueur.");
                     joueurAAttaquer = demanderEntier("Veuillez entrer le numéro du joueur que vous souhaitez attaquer :",1,joueurs.length)-1;
                 }
-                System.out.println("Vous effectuez "+joueurs[principal].capacite1Voleur(joueurs[joueurAAttaquer])+" dégâts et gagnez autant en vies.");
+                int degats = joueurs[principal].capacite1Voleur(joueurs[joueurAAttaquer]);
+                System.out.println("Vous effectuez "+degats+" dégâts et gagnez "+(int)Math.ceil((double)degats/2)+" de vie.");
             }
         }
         return nbActions-2;
@@ -208,7 +214,7 @@ public class JeuDeCombat {
                 System.out.println("Vous pouvez maintenant vous téléporter !!!");
                 x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
                 y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
-                while(trouverJoueur(joueurs, x, y)){
+                while(joueurCase(joueurs, x, y)){
                     System.out.println("Vous ne pouvez pas vous déplacer ici");
                     x = demanderEntier("Veuillez entrer la colonne où vous souhaitez vous déplacer :", 0, n - 1);
                     y = demanderEntier("Veuillez entrer la ligne où vous souhaitez vous déplacer :", 0, n - 1);
@@ -242,7 +248,7 @@ public class JeuDeCombat {
         System.out.println("Joueur "+ (gagnant+1) +", vous avez triomphé de tous vos adversaires les plus coriaces !");
     }
 
-    public static void afficherJeu(char terrain [][], Joueur joueurs[]) {
+    public static void afficherJeu(char terrain[][], Joueur joueurs[]) {
         System.out.print("| |");
         for (int i = 0; i < terrain[0].length; i++) {
             System.out.print(i+"|");
@@ -251,7 +257,7 @@ public class JeuDeCombat {
         for(int i=0; i<terrain.length; i ++){ // parcourt les lignes
             System.out.print("|"+i+"|");
             for(int j=0; j<terrain[0].length; j++){ // parcours les colonnes
-                System.out.print(joueurCase(terrain, joueurs, j, i) + "|");
+                System.out.print(joueurCase(joueurs, terrain, j, i) + "|");
             }
             System.out.println();
         }
@@ -261,12 +267,12 @@ public class JeuDeCombat {
 
     /**
      * Cherche si un joueur est présent à la position donnée
-     * @param joueurs Liste des joueurs
+     * @param joueurs
      * @param x
      * @param y
      * @return Joueur présent ou non
      */
-    private static boolean trouverJoueur(Joueur[] joueurs, int x, int y) {
+    private static boolean joueurCase(Joueur[] joueurs, int x, int y) {
         for(int i=0; i<joueurs.length; i++){
             if(joueurs[i].x == x && joueurs[i].y == y){
                 return true;
@@ -278,7 +284,7 @@ public class JeuDeCombat {
     public static boolean fini(Joueur[] joueurs) {
         int vivant = 0;
         for(int i=0; i<joueurs.length; i++){
-            if(!joueurs[i].mort){
+            if(!joueurs[i].getMort()){
                 vivant++;
             }
             if(vivant>1){
@@ -288,9 +294,14 @@ public class JeuDeCombat {
         return true;
     }
 
+    /**
+     * Trouve le gagnant si la méthode fini est vraie, sinon renvoie le premier joueur vivant.
+     * @param joueurs
+     * @return Indice du gagnant dans le tableau
+     */
     public static int trouverGagnant(Joueur[] joueurs) {
         for(int i=0; i<joueurs.length; i++){
-            if(!joueurs[i].mort){
+            if(!joueurs[i].getMort()){
                 return i;
             }
         }
@@ -299,22 +310,22 @@ public class JeuDeCombat {
 
     /**
      * Pour une case donnée, renvoie sa représentation pour les utilisateurs selon qu'un joueur y soit présent ou non
-     * @param terrain
      * @param joueurs
+     * @param terrain
      * @param x
      * @param y
      * @return la représentation de la case du derrain
      */
-    public static char joueurCase(char[][] terrain, Joueur[] joueurs, int x, int y){
+    public static char joueurCase(Joueur[] joueurs, char[][] terrain, int x, int y){
         for(int i=0; i<joueurs.length; i++){
-            if((joueurs[i].x == x) && (joueurs[i].y== y) && !joueurs[i].mort && !joueurs[i].estCache(terrain)){
+            if((joueurs[i].x == x) && (joueurs[i].y== y) && !joueurs[i].getMort() && !joueurs[i].estCache(terrain)){
                 return joueurs[i].caractere;
             }
         }
         return terrain[y][x];
     }
 
-    public static void remplissageTerrain(char terrain [][]){
+    public static void remplissageTerrain(char terrain[][]){
         for(int i = 0; i<terrain.length; i ++) {
             for (int j = 0; j < terrain[0].length; j++) {
                 if(Math.random()<0.1) {
