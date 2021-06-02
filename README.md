@@ -70,3 +70,9 @@ Organisation de la colaboration :
 
 * travail par Code With Me sur IntelIJ
 * utilisation de Git
+
+Séparation des tâches :
+
+* Une personne s'occupe de la classe Joueur
+* Les autres s'occupent de toutes les méthodes de la classe principale en lien avec l'affichage du jeu, l'interaction avec l'utilisateur et le déroulement global
+d'une partie
